@@ -84,7 +84,7 @@ BarWidget {
   Loader {
     id: panelLoader
     active: true
-    source: Qt.resolvedUrl("InputMethodPanel.qml?v=0.1.1")
+    source: Qt.resolvedUrl("InputMethodPanel.qml")
     visible: false
     onLoaded: {
       root.injectPanel()

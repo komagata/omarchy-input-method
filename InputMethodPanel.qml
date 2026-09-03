@@ -19,6 +19,8 @@ Panel {
   readonly property var methods: hostWidget ? hostWidget.status.methods : []
   readonly property string currentId: hostWidget ? hostWidget.status.currentId : ""
   readonly property var currentMethod: hostWidget ? hostWidget.status.current : null
+  readonly property bool inputActive: hostWidget ? hostWidget.status.state === 2 : false
+  readonly property bool actionBusy: hostWidget ? hostWidget.actionBusy : false
   readonly property var shortcuts: hostWidget ? hostWidget.status.triggerKeys : []
   readonly property color foreground: bar ? bar.foreground : Color.foreground
   readonly property color dim: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.65)
@@ -84,6 +86,7 @@ Panel {
           spacing: Style.space(8)
 
           PanelHero {
+            id: hero
             width: parent.width
             title: "Input Methods"
             meta: root.currentMethod ? Model.displayName(root.currentMethod) : "Fcitx 5"
@@ -97,6 +100,21 @@ Panel {
                 font.family: root.fontFamily
                 font.pixelSize: Style.font.display
                 font.bold: true
+              }
+            }
+            trailingControl: Component {
+              ToggleSwitch {
+                id: powerSwitch
+                checked: root.inputActive
+                busy: root.actionBusy
+                foreground: hero.foreground
+                onToggled: root.hostWidget.toggleInput()
+
+                PanelToolTip {
+                  visible: powerSwitch.containsMouse
+                  text: root.inputActive ? "Turn off input method" : "Turn on input method"
+                  fontFamily: hero.fontFamily
+                }
               }
             }
           }

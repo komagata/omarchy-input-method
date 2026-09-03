@@ -17,6 +17,7 @@ BarWidget {
   readonly property string actionHelper: pluginPath + "/bin/input-method-action"
   readonly property var currentMethod: status.current
   readonly property string displayLabel: status.available ? Model.displayLabel(currentMethod) : "?"
+  readonly property bool actionBusy: actionProcess.running
   readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
   readonly property bool popoutSwitchClosing: panelLoader.item ? panelLoader.item.popoutSwitchClosing === true : false
 

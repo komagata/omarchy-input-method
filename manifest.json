@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "komagata.input-method",
   "name": "Input Methods",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Masaki Komagata",
   "description": "Fcitx 5 input-method indicator and switcher",
   "kinds": ["bar-widget"],

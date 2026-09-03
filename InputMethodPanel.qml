@@ -206,12 +206,11 @@ Panel {
 
           Text {
             width: parent.width
-            text: "↑/↓ select  ·  Enter apply  ·  C configure  ·  Right-click bar to toggle"
+            text: "↑↓ Select · Enter Apply · C Configure"
             textFormat: Text.PlainText
             color: root.dim
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
-            wrapMode: Text.WordWrap
           }
         }
       }

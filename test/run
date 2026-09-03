@@ -5,6 +5,7 @@ set -euo pipefail
 root_dir=$(cd "$(dirname "$0")/.." && pwd)
 
 node "$root_dir/test/model-test.js"
+node "$root_dir/test/panel-layout-test.js"
 bash -n "$root_dir/bin/input-method-status"
 bash -n "$root_dir/bin/input-method-action"
 

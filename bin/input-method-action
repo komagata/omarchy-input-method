@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -o pipefail
+
+action=${1:-}
+
+case "$action" in
+  select)
+    input_method=${2:-}
+    [[ -n $input_method ]] || exit 2
+    group_info=$(busctl --user --json=short call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 FullInputMethodGroupInfo s "" 2>/dev/null) || exit 1
+    addon=$(jq -r --arg id "$input_method" '.data[4][] | select(.[0] == $id) | .[6]' <<<"$group_info")
+    [[ -n $addon ]] || exit 2
+    fcitx5-remote -s "$input_method" >/dev/null
+    if [[ $addon == "keyboard" || $input_method == keyboard-* ]]; then
+      fcitx5-remote -c >/dev/null
+    else
+      fcitx5-remote -o >/dev/null
+    fi
+    ;;
+  toggle)
+    fcitx5-remote -t >/dev/null
+    ;;
+  configure)
+    uwsm-app -- fcitx5-configtool >/dev/null 2>&1 &
+    ;;
+  *)
+    echo "Usage: input-method-action {select <id>|toggle|configure}" >&2
+    exit 2
+    ;;
+esac

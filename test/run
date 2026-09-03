@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euo pipefail
+
+root_dir=$(cd "$(dirname "$0")/.." && pwd)
+
+node "$root_dir/test/model-test.js"
+bash -n "$root_dir/bin/input-method-status"
+bash -n "$root_dir/bin/input-method-action"
+
+status=$($root_dir/bin/input-method-status)
+jq -e '
+  (.available | type) == "boolean" and
+  (.state | type) == "number" and
+  (.currentId | type) == "string" and
+  (.groupInfo | type) == "object" and
+  (.config | type) == "object"
+' <<<"$status" >/dev/null
+
+echo "helper tests passed"

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "komagata.input-method",
+  "name": "Input Methods",
+  "version": "0.1.0",
+  "author": "Masaki Komagata",
+  "description": "Fcitx 5 input-method indicator and switcher",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Input Methods",
+    "description": "Show and switch configured Fcitx 5 input methods",
+    "category": "System",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}

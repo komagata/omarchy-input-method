@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -o pipefail
+
+if ! command -v fcitx5-remote >/dev/null 2>&1 || ! command -v busctl >/dev/null 2>&1; then
+  jq -cn '{available:false,state:0,currentId:"",groupInfo:{},config:{}}'
+  exit 0
+fi
+
+state=$(fcitx5-remote 2>/dev/null) || state=0
+current_id=$(fcitx5-remote -n 2>/dev/null) || current_id=""
+group_info=$(busctl --user --json=short call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 FullInputMethodGroupInfo s "" 2>/dev/null) || group_info='{}'
+config=$(busctl --user --json=short call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 GetConfig s fcitx://config/global 2>/dev/null) || config='{}'
+
+jq -cn \
+  --argjson state "${state:-0}" \
+  --arg currentId "$current_id" \
+  --argjson groupInfo "$group_info" \
+  --argjson config "$config" \
+  '{available:($groupInfo.data != null),state:$state,currentId:$currentId,groupInfo:$groupInfo,config:$config}'

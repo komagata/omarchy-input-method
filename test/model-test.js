@@ -37,5 +37,10 @@ assert.deepEqual(
 assert.deepEqual(Model.triggerKeysFromConfig({}), []);
 assert.equal(Model.isKeyboard({ id: "keyboard-us", addon: "keyboard" }), true);
 assert.equal(Model.isKeyboard({ id: "hangul", addon: "hangul" }), false);
+assert.equal(Model.methodDescription(methods[0]), "English · Direct input");
+assert.equal(Model.methodDescription(methods[1]), "Japanese");
+assert.equal(Model.methodDescription(methods[2]), "Chinese");
+assert.equal(Model.methodDescription({ language: "ko", addon: "hangul" }), "Korean");
+assert.equal(Model.methodDescription({ language: "vi", addon: "unikey" }), "VI");
 
 console.log("model tests passed");

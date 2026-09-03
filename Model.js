@@ -60,6 +60,14 @@ function isKeyboard(method) {
   return !!method && (String(method.addon || "") === "keyboard" || String(method.id || "").indexOf("keyboard-") === 0)
 }
 
+function methodDescription(method) {
+  if (!method) return ""
+  var language = String(method.language || "").split(/[-_]/)[0].toLowerCase()
+  var names = { en: "English", ja: "Japanese", zh: "Chinese", ko: "Korean" }
+  var name = names[language] || language.toUpperCase()
+  return isKeyboard(method) ? (name ? name + " · Direct input" : "Direct input") : name
+}
+
 function parseStatus(raw) {
   try {
     var parsed = JSON.parse(String(raw || ""))
@@ -89,6 +97,7 @@ if (typeof module !== "undefined") {
     triggerKeysFromConfig: triggerKeysFromConfig,
     formatShortcut: formatShortcut,
     isKeyboard: isKeyboard,
+    methodDescription: methodDescription,
     parseStatus: parseStatus
   }
 }

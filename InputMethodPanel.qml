@@ -18,6 +18,7 @@ Panel {
   readonly property var barIdentity: hostWidget || root
   readonly property var methods: hostWidget ? hostWidget.status.methods : []
   readonly property string currentId: hostWidget ? hostWidget.status.currentId : ""
+  readonly property var currentMethod: hostWidget ? hostWidget.status.current : null
   readonly property var shortcuts: hostWidget ? hostWidget.status.triggerKeys : []
   readonly property color foreground: bar ? bar.foreground : Color.foreground
   readonly property color dim: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.65)
@@ -85,7 +86,7 @@ Panel {
           PanelHero {
             width: parent.width
             title: "Input Methods"
-            meta: "Fcitx 5"
+            meta: root.currentMethod ? Model.displayName(root.currentMethod) : "Fcitx 5"
             foreground: root.foreground
             fontFamily: root.fontFamily
             iconComponent: Component {
@@ -101,17 +102,6 @@ Panel {
           }
 
           Text {
-            visible: root.shortcuts.length > 0
-            width: parent.width
-            text: "Switch shortcuts\n" + root.shortcuts.join("\n")
-            textFormat: Text.PlainText
-            color: root.dim
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.bodySmall
-            wrapMode: Text.WordWrap
-          }
-
-          Text {
             visible: root.methods.length === 0
             width: parent.width
             text: "No configured input methods found"
@@ -121,20 +111,40 @@ Panel {
             font.pixelSize: Style.font.body
           }
 
+          PanelSeparator {
+            visible: root.methods.length > 0
+            width: parent.width
+            foreground: root.foreground
+          }
+
+          PanelSectionHeader {
+            visible: root.methods.length > 0
+            width: parent.width
+            text: "INPUT METHODS"
+            foreground: root.foreground
+            fontFamily: root.fontFamily
+          }
+
           Repeater {
             model: root.methods
 
-            CursorSurface {
+            Rectangle {
               id: methodRow
               required property var modelData
               required property int index
               width: content.width
-              implicitHeight: Math.max(Style.spacing.popupRowHeight, methodContent.implicitHeight + Style.spacing.rowPaddingX * 2)
-              hasCursor: root.cursorIndex === index
-              current: String(modelData.id) === root.currentId
-              foreground: root.foreground
+              height: Style.space(56)
+              radius: Style.space(6)
+              readonly property bool hasCursor: root.cursorIndex === index
+              readonly property bool current: String(modelData.id) === root.currentId
+              color: methodArea.containsMouse
+                ? Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.15)
+                : (hasCursor || current
+                    ? Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.08)
+                    : "transparent")
 
               MouseArea {
+                id: methodArea
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
@@ -173,7 +183,7 @@ Panel {
                   }
                   Text {
                     Layout.fillWidth: true
-                    text: String(methodRow.modelData.id)
+                    text: Model.methodDescription(methodRow.modelData)
                     textFormat: Text.PlainText
                     color: root.dim
                     font.family: root.fontFamily

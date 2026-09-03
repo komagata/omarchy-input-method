@@ -8,7 +8,7 @@ assert.doesNotMatch(panel, /Right-click bar to toggle/);
 assert.match(panel, /id: methodContent/);
 assert.match(
   panel,
-  /implicitHeight: Math\.max\(Style\.spacing\.popupRowHeight, methodContent\.implicitHeight \+ Style\.spacing\.rowPaddingX\)/,
+  /implicitHeight: Math\.max\(Style\.spacing\.popupRowHeight, methodContent\.implicitHeight \+ Style\.spacing\.rowPaddingX \* 2\)/,
 );
 
 console.log("panel layout tests passed");

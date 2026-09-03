@@ -129,7 +129,7 @@ Panel {
               required property var modelData
               required property int index
               width: content.width
-              implicitHeight: Math.max(Style.spacing.popupRowHeight, methodContent.implicitHeight + Style.spacing.rowPaddingX)
+              implicitHeight: Math.max(Style.spacing.popupRowHeight, methodContent.implicitHeight + Style.spacing.rowPaddingX * 2)
               hasCursor: root.cursorIndex === index
               current: String(modelData.id) === root.currentId
               foreground: root.foreground

@@ -4,6 +4,10 @@ An Omarchy bar widget for the input methods already configured in Fcitx 5. It sh
 
 The list comes from the active Fcitx group rather than a hardcoded language list. Mozc, Hazkey, Rime, Hangul, and future engines can therefore share the same interface.
 
+![Input Methods panel showing English, Mozc, Rime, and Hangul](docs/input-method-panel.png)
+
+The screenshot was captured in a disposable Omarchy VM with Japanese, Chinese, and Korean input engines configured in the same Fcitx group.
+
 This plugin manages switching and visibility. Installing input engines and making them available immediately after a fresh Omarchy installation are separate setup concerns.
 
 ## Requirements

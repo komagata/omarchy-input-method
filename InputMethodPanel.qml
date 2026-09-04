@@ -225,7 +225,7 @@ Panel {
           Button {
             width: parent.width
             text: "Configure Fcitx 5"
-            iconText: ""
+            iconText: "›"
             foreground: root.foreground
             fontFamily: root.fontFamily
             bordered: true

@@ -18,7 +18,7 @@ assert.match(panel, /checked: root\.inputActive/);
 assert.match(panel, /busy: root\.actionBusy/);
 assert.match(panel, /onToggled: root\.hostWidget\.toggleInput\(\)/);
 assert.match(panel, /text: root\.inputActive \? "Turn off input method" : "Turn on input method"/);
-assert.match(panel, /iconText: "󰒓"/);
+assert.match(panel, /iconText: "⚙︎"/);
 assert.doesNotMatch(panel, /iconText: "⚙"/);
 
 console.log("panel layout tests passed");

@@ -16,6 +16,7 @@ function methodsFromGroupInfo(groupInfo) {
 
 function displayName(method) {
   if (!method) return "Unknown"
+  if (String(method.id || "") === "keyboard-us") return "English (US)"
   return String(method.nativeName || method.name || method.id || "Unknown")
 }
 

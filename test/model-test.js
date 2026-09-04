@@ -19,6 +19,7 @@ assert.deepEqual(methods, [
 
 assert.equal(Model.displayName(methods[2]), "中州韻");
 assert.equal(Model.displayName(methods[1]), "Mozc");
+assert.equal(Model.displayName({ id: "keyboard-us", name: "キーボード - 英語 (US)", language: "en", addon: "keyboard" }), "English (US)");
 assert.equal(Model.displayLabel(methods[2]), "中");
 assert.equal(Model.displayLabel({ id: "future-engine", name: "Future Engine", label: "" }), "FE");
 

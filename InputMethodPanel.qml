@@ -228,7 +228,8 @@ Panel {
 
                   Text {
                     Layout.preferredWidth: Style.space(32)
-                    text: Model.displayLabel(methodRow.modelData)
+                    text: Model.panelLabel(methodRow.modelData)
+                    visible: text !== ""
                     textFormat: Text.PlainText
                     color: methodRow.current ? root.foreground : root.dim
                     font.family: root.fontFamily

@@ -9,6 +9,7 @@ assert.doesNotMatch(panel, /hasCursor\s*\|\|\s*current/);
 assert.match(panel, /text: "↑↓ Select · Enter Apply · C Configure"/);
 assert.doesNotMatch(panel, /Right-click bar to toggle/);
 assert.match(panel, /text: Model\.methodDescription\(methodRow\.modelData\)/);
+assert.match(panel, /text: Model\.panelLabel\(methodRow\.modelData\)\s+visible: text !== ""/);
 assert.doesNotMatch(panel, /text: String\(methodRow\.modelData\.id\)/);
 assert.match(panel, /text: "Current"/);
 assert.doesNotMatch(panel, /text: "✓"/);

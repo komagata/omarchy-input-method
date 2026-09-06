@@ -22,13 +22,15 @@ function displayName(method) {
 
 function displayLabel(method) {
   if (!method) return "?"
-  var label = String(method.label || "").trim()
-  if (label !== "") return label
-  var name = displayName(method).replace(/[^\p{L}\p{N}]+/gu, " ").trim()
-  if (name === "") return "?"
-  var words = name.split(/\s+/)
-  if (words.length > 1) return (words[0][0] + words[1][0]).toUpperCase()
-  return name.substring(0, 2).toUpperCase()
+  // Language identifiers, not live conversion-mode indicators.
+  var language = String(method.language || "").split(/[-_]/)[0].toLowerCase()
+  var symbols = { ja: "あ", zh: "中", ko: "한", en: "A", ru: "Я", ar: "ع", th: "ก" }
+  if (Object.prototype.hasOwnProperty.call(symbols, language)) return symbols[language]
+  return /^[a-z]{2,3}$/.test(language) ? language : "?"
+}
+
+function panelLabel(method) {
+  return displayLabel(method)
 }
 
 function triggerKeysFromConfig(config) {
@@ -95,6 +97,7 @@ if (typeof module !== "undefined") {
     methodsFromGroupInfo: methodsFromGroupInfo,
     displayName: displayName,
     displayLabel: displayLabel,
+    panelLabel: panelLabel,
     triggerKeysFromConfig: triggerKeysFromConfig,
     formatShortcut: formatShortcut,
     isKeyboard: isKeyboard,

@@ -21,7 +21,20 @@ assert.equal(Model.displayName(methods[2]), "中州韻");
 assert.equal(Model.displayName(methods[1]), "Mozc");
 assert.equal(Model.displayName({ id: "keyboard-us", name: "キーボード - 英語 (US)", language: "en", addon: "keyboard" }), "English (US)");
 assert.equal(Model.displayLabel(methods[2]), "中");
-assert.equal(Model.displayLabel({ id: "future-engine", name: "Future Engine", label: "" }), "FE");
+assert.equal(Model.displayLabel({ id: "future-engine", name: "Future Engine", label: "" }), "?");
+for (const [label, language, expected] of [
+  ["Hazkey", "ja", "あ"], ["Karukan", "ja_JP", "あ"], ["Zenzai", "ja", "あ"],
+  ["あ", "ja", "あ"], ["한", "ko", "한"], ["中", "zh", "中"],
+  ["Long Chinese label", "zh-Hant", "中"], ["Long Korean label", "ko", "한"],
+  ["en", "en", "A"], ["", "DE_de", "de"], ["", "fil", "fil"],
+  ["", "ru", "Я"], ["", "ar", "ع"], ["", "th", "ก"],
+  ["", "", "?"], ["", "invalid", "?"], ["<>", "ja", "あ"],
+  ["\u200b", "ja", "あ"], ["a\nb", "en", "A"], ["あ", "", "?"]
+]) {
+  assert.equal(Model.displayLabel({ label, language }), expected);
+  assert.equal(Model.panelLabel({ label, language }), expected);
+}
+assert.equal(Model.displayLabel(null), "?");
 
 assert.deepEqual(
   Model.triggerKeysFromConfig({ data: [{ data: {
@@ -43,5 +56,7 @@ assert.equal(Model.methodDescription(methods[1]), "Japanese");
 assert.equal(Model.methodDescription(methods[2]), "Chinese");
 assert.equal(Model.methodDescription({ language: "ko", addon: "hangul" }), "Korean");
 assert.equal(Model.methodDescription({ language: "vi", addon: "unikey" }), "VI");
+
+assert.equal(Model.panelLabel(null), "?");
 
 console.log("model tests passed");

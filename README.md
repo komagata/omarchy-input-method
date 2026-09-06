@@ -8,6 +8,11 @@ The list comes from the active Fcitx group rather than a hardcoded language list
 
 The screenshot was captured in a disposable `en_US.UTF-8` Omarchy VM with Japanese, Chinese, and Korean input engines configured in the same Fcitx group.
 
+Long-name layout check (Karukan and Zenzai), using display-only fixture data in
+the same VM rather than real conversion engines:
+
+![Language symbols with Karukan and Zenzai test entries](docs/long-name-layout.png)
+
 This plugin manages switching and visibility. Installing input engines and making them available immediately after a fresh Omarchy installation are separate setup concerns.
 
 ## Requirements
@@ -30,6 +35,13 @@ omarchy plugin enable komagata.input-method
 - Right-click the bar label to toggle Fcitx.
 - Use Up/Down and Enter in the panel to select an input method.
 - Press `C` in the panel to open Fcitx configuration.
+
+The bar and panel use the same language symbol: Japanese `あ`, Chinese `中`,
+Korean `한`, English `A`, Russian `Я`, Arabic `ع`, and Thai `ก`.
+Other languages use their two- or three-letter language code; missing or invalid
+language information displays `?`. Full engine names remain in the panel and
+tooltip. These symbols identify the input language, not the current conversion
+mode (such as hiragana versus Latin input).
 
 ## Remove
 

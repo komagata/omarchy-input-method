@@ -8,11 +8,6 @@ The list comes from the active Fcitx group rather than a hardcoded language list
 
 The screenshot was captured in a disposable `en_US.UTF-8` Omarchy VM with Japanese, Chinese, and Korean input engines configured in the same Fcitx group.
 
-Long-name layout check (Karukan and Zenzai), using display-only fixture data in
-the same VM rather than real conversion engines:
-
-![Language symbols with Karukan and Zenzai test entries](docs/long-name-layout.png)
-
 This plugin manages switching and visibility. Installing input engines and making them available immediately after a fresh Omarchy installation are separate setup concerns.
 
 ## Requirements

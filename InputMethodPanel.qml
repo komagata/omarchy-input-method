@@ -58,7 +58,8 @@ Panel {
     bar: root.bar
     open: root.opened
     focusTarget: keyCatcher
-    contentWidth: panel.fittedContentWidth(Style.space(360))
+    padding: Style.space(20)
+    contentWidth: panel.fittedContentWidth(Style.space(380))
     contentHeight: panel.fittedContentHeight(content.implicitHeight, Style.space(520))
 
     PanelKeyCatcher {
@@ -83,13 +84,15 @@ Panel {
         Column {
           id: content
           width: parent.width
-          spacing: Style.space(8)
+          spacing: Style.space(6)
+
+          Item { width: 1; height: Style.space(4) }
 
           PanelHero {
             id: hero
             width: parent.width
             title: "Input Methods"
-            meta: root.currentMethod ? Model.displayName(root.currentMethod) : "Fcitx 5"
+            meta: root.inputActive ? "Input method enabled" : "Direct input"
             foreground: root.foreground
             fontFamily: root.fontFamily
             iconComponent: Component {
@@ -119,6 +122,8 @@ Panel {
             }
           }
 
+          Item { width: 1; height: Style.space(12) }
+
           Text {
             visible: root.methods.length === 0
             width: parent.width
@@ -135,13 +140,7 @@ Panel {
             foreground: root.foreground
           }
 
-          PanelSectionHeader {
-            visible: root.methods.length > 0
-            width: parent.width
-            text: "INPUT METHODS"
-            foreground: root.foreground
-            fontFamily: root.fontFamily
-          }
+          Item { width: 1; height: Style.space(4) }
 
           Repeater {
             model: root.methods
@@ -151,7 +150,7 @@ Panel {
               required property var modelData
               required property int index
               width: content.width
-              height: Style.space(56)
+              height: Math.max(Style.space(60), methodContent.implicitHeight + Style.space(24))
               radius: Style.space(6)
               readonly property bool hasCursor: root.cursorIndex === index
               readonly property bool current: String(modelData.id) === root.currentId
@@ -172,8 +171,8 @@ Panel {
 
               RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Style.spacing.rowPaddingX
-                anchors.rightMargin: Style.spacing.rowPaddingX
+                anchors.leftMargin: Style.space(14)
+                anchors.rightMargin: Style.space(14)
                 spacing: Style.spacing.controlGap
 
                 Text {
@@ -183,13 +182,14 @@ Panel {
                   font.family: root.fontFamily
                   font.pixelSize: Style.font.title
                   font.bold: true
-                  Layout.preferredWidth: Style.space(34)
+                  Layout.preferredWidth: Style.space(32)
+                  horizontalAlignment: Text.AlignHCenter
                 }
 
                 ColumnLayout {
                   id: methodContent
                   Layout.fillWidth: true
-                  spacing: 0
+                  spacing: Style.space(4)
                   Text {
                     Layout.fillWidth: true
                     text: Model.displayName(methodRow.modelData)
@@ -222,15 +222,60 @@ Panel {
             }
           }
 
+          Item { width: 1; height: Style.space(8) }
+
+          PanelSeparator {
+            width: parent.width
+            foreground: root.foreground
+          }
+
           Button {
             width: parent.width
             text: "Configure Fcitx 5"
             iconText: "›"
             foreground: root.foreground
             fontFamily: root.fontFamily
-            bordered: true
+            bordered: false
             leftAlign: true
             onClicked: { root.hostWidget.configure(); root.close() }
+          }
+
+          Text {
+            visible: root.shortcuts.length > 0
+            width: parent.width
+            text: "Toggle input"
+            textFormat: Text.PlainText
+            color: root.dim
+            font.family: root.fontFamily
+            font.pixelSize: Style.font.caption
+            horizontalAlignment: Text.AlignHCenter
+          }
+
+          Flow {
+            width: parent.width
+            spacing: Style.space(6)
+            Repeater {
+              model: root.shortcuts
+              Rectangle {
+                id: shortcutBadge
+                required property string modelData
+                width: Math.min(shortcutText.implicitWidth + Style.space(16), content.width)
+                height: shortcutText.implicitHeight + Style.space(10)
+                radius: Style.space(4)
+                color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.06)
+                Text {
+                  id: shortcutText
+                  anchors.centerIn: parent
+                  width: Math.min(implicitWidth, content.width - Style.space(16))
+                  text: shortcutBadge.modelData
+                  textFormat: Text.PlainText
+                  color: root.dim
+                  font.family: root.fontFamily
+                  font.pixelSize: Style.font.caption
+                  wrapMode: Text.Wrap
+                }
+              }
+            }
           }
 
           Text {
@@ -240,7 +285,10 @@ Panel {
             color: root.dim
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
+            horizontalAlignment: Text.AlignHCenter
           }
+
+          Item { width: 1; height: Style.space(4) }
         }
       }
     }

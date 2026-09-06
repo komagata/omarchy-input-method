@@ -23,8 +23,13 @@ Panel {
   readonly property bool actionBusy: hostWidget ? hostWidget.actionBusy : false
   readonly property var shortcuts: hostWidget ? hostWidget.status.triggerKeys : []
   readonly property color foreground: bar ? bar.foreground : Color.foreground
+  readonly property color accent: Color.accent
   readonly property color dim: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.65)
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
+  // One left edge for everything. PanelHero indents its labels by this much
+  // past the (empty) icon slot, so method names, the configure button, and
+  // the footer all sit on the same vertical line as the title.
+  readonly property int inset: Style.space(14)
   property int cursorIndex: 0
 
   function open() {
@@ -84,10 +89,13 @@ Panel {
         Column {
           id: content
           width: parent.width
-          spacing: Style.space(6)
+          spacing: 0
 
           Item { width: 1; height: Style.space(4) }
 
+          // No icon in the hero: the bar already shows the current label and
+          // every row carries its own, so a display-size glyph up here only
+          // repeated what sits directly beneath it.
           PanelHero {
             id: hero
             width: parent.width
@@ -95,16 +103,6 @@ Panel {
             meta: root.inputActive ? "Input method enabled" : "Direct input"
             foreground: root.foreground
             fontFamily: root.fontFamily
-            iconComponent: Component {
-              Text {
-                text: root.hostWidget ? root.hostWidget.displayLabel : "?"
-                textFormat: Text.PlainText
-                color: root.foreground
-                font.family: root.fontFamily
-                font.pixelSize: Style.font.display
-                font.bold: true
-              }
-            }
             trailingControl: Component {
               ToggleSwitch {
                 id: powerSwitch
@@ -122,112 +120,135 @@ Panel {
             }
           }
 
-          Item { width: 1; height: Style.space(12) }
+          Item { width: 1; height: Style.space(16) }
+
+          PanelSeparator {
+            width: parent.width
+            foreground: root.foreground
+          }
+
+          Item { width: 1; height: Style.space(10) }
 
           Text {
             visible: root.methods.length === 0
             width: parent.width
+            leftPadding: root.inset
+            rightPadding: root.inset
             text: "No configured input methods found"
             textFormat: Text.PlainText
             color: root.dim
             font.family: root.fontFamily
             font.pixelSize: Style.font.body
+            wrapMode: Text.Wrap
           }
 
-          PanelSeparator {
-            visible: root.methods.length > 0
+          Column {
+            id: methodList
             width: parent.width
-            foreground: root.foreground
-          }
+            spacing: Style.space(4)
 
-          Item { width: 1; height: Style.space(4) }
+            Repeater {
+              model: root.methods
 
-          Repeater {
-            model: root.methods
+              // Rows paint with the kit's state tokens so the two highlights
+              // read differently: the keyboard/mouse cursor gets the
+              // hover-cursor fill and border, while the current method keeps
+              // the selected fill, a bold selected-color name, and a caption.
+              BorderSurface {
+                id: methodRow
+                required property var modelData
+                required property int index
+                readonly property bool hasCursor: root.cursorIndex === index
+                readonly property bool current: String(modelData.id) === root.currentId
+                width: methodList.width
+                height: Math.max(Style.space(56), methodContent.implicitHeight + Style.space(24))
+                radius: Style.cornerRadius
+                color: methodArea.pressed ? Style.pressedFillFor(root.foreground, root.accent)
+                  : hasCursor ? Style.hoverFillFor(root.foreground, root.accent)
+                  : current ? Style.selectedFillFor(root.foreground, root.accent)
+                  : "transparent"
+                borderSpec: hasCursor ? Border.controlSpec("hover-cursor", root.foreground, root.accent)
+                  : (current && Border.controlHasWidth("selected")) ? Border.controlSpec("selected", root.foreground, root.accent)
+                  : Border.none()
 
-            Rectangle {
-              id: methodRow
-              required property var modelData
-              required property int index
-              width: content.width
-              height: Math.max(Style.space(60), methodContent.implicitHeight + Style.space(24))
-              radius: Style.space(6)
-              readonly property bool hasCursor: root.cursorIndex === index
-              readonly property bool current: String(modelData.id) === root.currentId
-              color: methodArea.containsMouse
-                ? Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.15)
-                : (hasCursor || current
-                    ? Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.08)
-                    : "transparent")
-
-              MouseArea {
-                id: methodArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onEntered: root.cursorIndex = methodRow.index
-                onClicked: root.select(methodRow.index)
-              }
-
-              RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: Style.space(14)
-                anchors.rightMargin: Style.space(14)
-                spacing: Style.spacing.controlGap
-
-                Text {
-                  text: Model.displayLabel(methodRow.modelData)
-                  textFormat: Text.PlainText
-                  color: root.foreground
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.title
-                  font.bold: true
-                  Layout.preferredWidth: Style.space(32)
-                  horizontalAlignment: Text.AlignHCenter
+                MouseArea {
+                  id: methodArea
+                  anchors.fill: parent
+                  hoverEnabled: true
+                  cursorShape: Qt.PointingHandCursor
+                  onEntered: root.cursorIndex = methodRow.index
+                  onClicked: root.select(methodRow.index)
                 }
 
-                ColumnLayout {
-                  id: methodContent
-                  Layout.fillWidth: true
-                  spacing: Style.space(4)
-                  Text {
+                RowLayout {
+                  anchors.fill: parent
+                  anchors.leftMargin: root.inset
+                  anchors.rightMargin: root.inset
+                  spacing: Style.spacing.controlGap
+
+                  ColumnLayout {
+                    id: methodContent
                     Layout.fillWidth: true
-                    text: Model.displayName(methodRow.modelData)
-                    textFormat: Text.PlainText
-                    color: root.foreground
-                    font.family: root.fontFamily
-                    font.pixelSize: Style.font.body
-                    elide: Text.ElideRight
+                    spacing: Style.space(3)
+
+                    Text {
+                      Layout.fillWidth: true
+                      text: Model.displayName(methodRow.modelData)
+                      textFormat: Text.PlainText
+                      color: methodRow.current ? Style.selectedStateColor(root.foreground, root.accent) : root.foreground
+                      font.family: root.fontFamily
+                      font.pixelSize: Style.font.title
+                      font.bold: methodRow.current
+                      elide: Text.ElideRight
+                    }
+
+                    Text {
+                      Layout.fillWidth: true
+                      visible: text !== ""
+                      text: Model.methodDescription(methodRow.modelData)
+                      textFormat: Text.PlainText
+                      color: root.dim
+                      font.family: root.fontFamily
+                      font.pixelSize: Style.font.bodySmall
+                      elide: Text.ElideRight
+                    }
                   }
+
                   Text {
-                    Layout.fillWidth: true
-                    text: Model.methodDescription(methodRow.modelData)
+                    visible: methodRow.current
+                    text: "Current"
                     textFormat: Text.PlainText
                     color: root.dim
                     font.family: root.fontFamily
                     font.pixelSize: Style.font.caption
+                    font.bold: true
+                    font.letterSpacing: 1.2
+                    font.capitalization: Font.AllUppercase
+                  }
+
+                  Text {
+                    Layout.preferredWidth: Style.space(32)
+                    text: Model.displayLabel(methodRow.modelData)
+                    textFormat: Text.PlainText
+                    color: methodRow.current ? root.foreground : root.dim
+                    font.family: root.fontFamily
+                    font.pixelSize: Style.font.title
+                    horizontalAlignment: Text.AlignRight
                     elide: Text.ElideRight
                   }
-                }
-
-                Text {
-                  visible: methodRow.current
-                  text: "✓"
-                  textFormat: Text.PlainText
-                  color: root.foreground
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.title
                 }
               }
             }
           }
 
-          Item { width: 1; height: Style.space(8) }
+          Item { width: 1; height: Style.space(12) }
 
           PanelSeparator {
             width: parent.width
             foreground: root.foreground
           }
+
+          Item { width: 1; height: Style.space(6) }
 
           Button {
             width: parent.width
@@ -237,55 +258,76 @@ Panel {
             fontFamily: root.fontFamily
             bordered: false
             leftAlign: true
+            horizontalPadding: root.inset
             onClicked: { root.hostWidget.configure(); root.close() }
           }
 
+          Item { width: 1; height: Style.space(10) }
+
           Text {
+            id: shortcutLabel
             visible: root.shortcuts.length > 0
             width: parent.width
+            leftPadding: root.inset
             text: "Toggle input"
             textFormat: Text.PlainText
             color: root.dim
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
-            horizontalAlignment: Text.AlignHCenter
           }
 
+          Item { width: 1; height: root.shortcuts.length > 0 ? Style.space(6) : 0 }
+
           Flow {
+            id: shortcutRow
+            visible: root.shortcuts.length > 0
             width: parent.width
+            leftPadding: root.inset
+            rightPadding: root.inset
             spacing: Style.space(6)
+            readonly property int chipHeight: shortcutLabel.implicitHeight + Style.space(10)
+            readonly property int chipMaxWidth: width - leftPadding - rightPadding
+
             Repeater {
               model: root.shortcuts
-              Rectangle {
+
+              BorderSurface {
                 id: shortcutBadge
                 required property string modelData
-                width: Math.min(shortcutText.implicitWidth + Style.space(16), content.width)
-                height: shortcutText.implicitHeight + Style.space(10)
-                radius: Style.space(4)
-                color: Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.06)
+                width: Math.min(shortcutText.implicitWidth + Style.space(16), shortcutRow.chipMaxWidth)
+                height: Math.max(shortcutRow.chipHeight, shortcutText.implicitHeight + Style.space(10))
+                radius: Style.cornerRadius
+                color: Style.normalFillFor(root.foreground, root.accent)
+                borderSpec: Border.controlSpec("normal", root.foreground, root.accent)
+
                 Text {
                   id: shortcutText
                   anchors.centerIn: parent
-                  width: Math.min(implicitWidth, content.width - Style.space(16))
+                  width: Math.min(implicitWidth, shortcutRow.chipMaxWidth - Style.space(16))
                   text: shortcutBadge.modelData
                   textFormat: Text.PlainText
-                  color: root.dim
+                  color: root.foreground
                   font.family: root.fontFamily
                   font.pixelSize: Style.font.caption
                   wrapMode: Text.Wrap
+                  horizontalAlignment: Text.AlignHCenter
                 }
               }
             }
           }
 
+          Item { width: 1; height: Style.space(10) }
+
           Text {
             width: parent.width
+            leftPadding: root.inset
+            rightPadding: root.inset
             text: "↑↓ Select · Enter Apply · C Configure"
             textFormat: Text.PlainText
             color: root.dim
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
-            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
           }
 
           Item { width: 1; height: Style.space(4) }
